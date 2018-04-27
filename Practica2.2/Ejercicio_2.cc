@@ -19,7 +19,7 @@ using namespace std;
 
 bool connected = true;
 void printError();
-void processMsg(char c);
+
 
 int main(int argc, char* argv[]){
 
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]){
 
 
 
-
+	freeaddrinfo(res);
 
 
     while(connected){
@@ -66,10 +66,10 @@ int main(int argc, char* argv[]){
 
         char buf[256];
         struct sockaddr src;
-        socklen_t size;
+        socklen_t size = sizeof(src);
 
     	//Receive
-    	ssize_t bytesRec =  recvfrom(udp_socket, &buf, 256, 0, &src, &size);
+    	ssize_t bytesRec =  recvfrom(udp_socket, &buf, 255, 0, &src, &size);
 
     	char host[NI_MAXHOST];
 		char server[NI_MAXSERV];
@@ -81,8 +81,42 @@ int main(int argc, char* argv[]){
 		}
 
 		cout << bytesRec << " bytes de " << host << ":" << server << endl;
-		processMsg(buf[0]);
-		sendto(udp_socket,buf,bytesRec,0, &src, size);
+		
+		
+		struct tm* timeT;
+		time_t t;
+		char c = buf[0];
+		memset((void*) buf,'\0', 256);
+		switch(c){
+			case 't':
+				 cout << "Enviando hora" << endl;
+				
+				time(&t);
+				timeT = localtime(&t);
+				strftime(buf, 256, "%H-%M-%S\n", timeT);
+				sendto(udp_socket,buf,256,0, &src,size);			 
+
+				break;
+			case 'd':
+				 cout << "Enviando fecha" << endl;
+				
+				time(&t);
+				timeT = localtime(&t);
+				strftime(buf, 256, "%Y-%m-%d\n", timeT);
+				sendto(udp_socket,buf,256,0, &src,size);	
+
+				break;
+			case 'q':
+				connected = false;
+
+				break;
+			default:
+				break;			
+				
+			
+			
+			}	
+		
 
     }
 
@@ -105,29 +139,7 @@ void printError(){
 
 }
 
-void processMsg(char c){
 
 
-
-	//memset((void*)buf,'\0', 256);
-	switch (c) {
-		case 't':
-			 cout << "Enviando hora" << endl;
-
-			break;
-		case 'd':
-		 	 cout << "Enviando fecha" << endl;
-
-			break;
-		case 'q':
-			connected = false;
-
-			break;
-		default:
-			break;
-	}
-
-
-}
 
 
