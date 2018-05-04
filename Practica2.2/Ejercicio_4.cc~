@@ -81,7 +81,6 @@ int main(int argc, char* argv[]){
 
 
 		int idSrc = accept(tcp_socket, &src, &size);
-		connected = true;
 		
 		if(idSrc == -1){
 			printError();
