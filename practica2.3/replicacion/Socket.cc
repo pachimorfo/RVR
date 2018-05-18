@@ -32,7 +32,7 @@ bool operator== (const Socket &s1, const Socket &s2)
 	int gNumber = getnameinfo(&s1.sa,s1.sa_len,host1, NI_MAXHOST,
 			server1, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
 
-	gNumber = getnameinfo(&s2.sa,s1.sa_len,host2, NI_MAXHOST,
+	gNumber = getnameinfo(&s2.sa,s2.sa_len,host2, NI_MAXHOST,
 			server2, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
 
 
@@ -127,7 +127,7 @@ int Socket::send(Serializable * obj, Socket * sock)
 
 // ----------------------------------------------------------------------------
 
-int Socket::recv(char * buffer, Socket * sock)
+int Socket::recv(char * buffer, Socket ** sock)
 {
 
 
@@ -139,22 +139,16 @@ int Socket::recv(char * buffer, Socket * sock)
 
 	if(sock != 0){
 
-		int eGetName = getnameinfo(&src, size,host, NI_MAXHOST,
-				server, NI_MAXSERV, NI_NUMERICHOST | NI_NUMERICSERV);
-		if(eGetName != 0){
-			printError();
-			return -1;
-		}
-		sock = new Socket(host,server);
-		ssize_t bytesRec =  recvfrom(sock->sd, (void* )&buffer,
+		ssize_t bytesRec =  recvfrom(sd, (void* )&buffer,
 		    			MAX_MESSAGE_SIZE, 0, &src, &size);
+		sock = new Socket(&src,size);
 		if(bytesRec == -1){
 			printError();
 			return -1;
 		}
 	}else{
 
-    	ssize_t bytesRec =  recvfrom(sock->sd, (void* )&buffer,
+    	ssize_t bytesRec =  recvfrom(sd, (void* )&buffer,
     			MAX_MESSAGE_SIZE, 0, &src, &size);
 
     	if(bytesRec == -1){

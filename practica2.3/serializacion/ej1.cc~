@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 		int32_t size;
 		
 		int32_t sizeReturn = read(fd, &size, sizeof(int32_t));
-		std
+		
  		if(sizeReturn == -1){
 			printError();
 			return -1;

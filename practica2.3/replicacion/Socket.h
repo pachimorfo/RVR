@@ -84,7 +84,7 @@ public:
      *
      *    @return 0 en caso de éxito o -1 si error (cerrar conexión)
      */
-    int recv(char * obj, Socket * sock);
+    int recv(char * obj, Socket ** sock);
 
     int recv(char * obj)
     {

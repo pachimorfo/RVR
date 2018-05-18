@@ -68,11 +68,14 @@ public:
         return _size;
     }
 
-protected:
+
 
     int32_t _size;
 
     char *  _data;
+
+protected:
+    int p;
 
     /**
      *  Reserva memoria para el buffer del objeto serializado

@@ -27,24 +27,94 @@ extern "C" void * _server_thread(void *arg)
 
 int UDPServer::start()
 {
+	pthread_t idThreads[THREAD_POOL_SIZE];
+
+	for(int i = 0; i < THREAD_POOL_SIZE; i++){
+
+		pthread_attr_t attr;
+		pthread_attr_init(&attr);
+		pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+
+		int threadError = pthread_create(&idThreads[i], &attr, _server_thread, static_cast<void*>(this));
+
+		if(threadError != 0){
+			std::cout << "Error al crear thread" << std::endl;
+			return -1;
+		}
+
+	}
+
+	return 0;
+
 }
 
 // ----------------------------------------------------------------------------
 
 void UDPServer::server_thread()
 {
+
+	while(true){
+
+			char* buf;
+			struct sockaddr src;
+			socklen_t size = sizeof(src);
+
+			Socket* newSocket;
+
+			socket.recv(buf,&newSocket);
+
+			add_connection(newSocket);
+
+			do_message(buf);
+	}
+
 }
 
 // ----------------------------------------------------------------------------
 
 void UDPServer::add_connection (Socket * s)
 {
+	pthread_mutex_lock(&mutex);
+
+	bool alreadyIn = false;
+
+	for(Socket* mySocket : connections){
+
+		if(s == mySocket){delete s; alreadyIn = true;}
+
+	}
+
+	if(!alreadyIn && connections.size() < THREAD_POOL_SIZE){
+		connections.push_back(s);
+	}
+
+	pthread_mutex_unlock(&mutex);
+
 }
+
 
 // ----------------------------------------------------------------------------
 
 void UDPServer::del_connection (Socket * s)
 {
+
+	pthread_mutex_lock(&mutex);
+
+	bool found = false;
+
+	std::vector<Socket *>::iterator it = connections.begin();
+
+	while (it != connections.end() && !found){
+		if((*it) == s){
+			connections.erase(it);
+			found = true;
+		}
+	}
+
+	if(!found)
+		delete s;
+
+	pthread_mutex_unlock(&mutex);
 }
 
 // ----------------------------------------------------------------------------

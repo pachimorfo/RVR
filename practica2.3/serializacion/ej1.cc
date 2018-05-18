@@ -37,7 +37,7 @@ public:
 
     void to_bin()
     {
-	int32_t total = (80 * sizeof(char)) + (2 * sizeof(int32_t) + sizeof(int32_t));
+	int32_t total = (80 * sizeof(char)) + (2 * sizeof(int16_t) + sizeof(int32_t));
 
 	alloc_data(total + sizeof(int32_t));
 	char* pointer = _data;
