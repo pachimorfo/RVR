@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& os, const Socket& s)
     getnameinfo((struct sockaddr *) &(s.sa), s.sa_len, host, NI_MAXHOST, serv,
                 NI_MAXSERV, NI_NUMERICHOST);
 
-    os << host << ":" << serv;
+    return os << host << ":" << serv;
 }
 
 // ----------------------------------------------------------------------------
@@ -76,6 +76,8 @@ Socket::Socket(const char * address, const char * port):sd(-1)
 	struct addrinfo* res;
 
 	int eGetAddr = getaddrinfo(address, port, &hints, &res);
+	sa = res->ai_addr;
+	sa_len = res->ai_addrlen;
 	if(eGetAddr != 0){
 		printError();
 		throw new std::runtime_error("Error getaddrinfo");
@@ -113,7 +115,8 @@ int Socket::bind()
 int Socket::send(Serializable * obj, Socket * sock)
 {
 
-	//llega serializado o lo serializamos aqui
+	obj->to_bin();
+
 
 	int s = sendto(sock->sd,(void*)obj->_data,obj->_size,0,&sock->sa,sock->sa_len);
 
