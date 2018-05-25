@@ -15,6 +15,7 @@ extern "C" void * _client_thread(void *arg)
 int main(int argc, char **argv)
 {
     ChatClient ec(argv[1], argv[2], argv[3]);
+	std::cout << "hey";
 
     pthread_attr_t attr;
     pthread_t id;

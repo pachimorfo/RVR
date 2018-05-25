@@ -76,7 +76,7 @@ Socket::Socket(const char * address, const char * port):sd(-1)
 	struct addrinfo* res;
 
 	int eGetAddr = getaddrinfo(address, port, &hints, &res);
-	sa = res->ai_addr;
+	sa  = *(res->ai_addr);
 	sa_len = res->ai_addrlen;
 	if(eGetAddr != 0){
 		printError();
@@ -140,11 +140,11 @@ int Socket::recv(char * buffer, Socket ** sock)
 	char host[NI_MAXHOST];
 	char server[NI_MAXSERV];
 
-	if(sock != 0){
+	if(*sock != 0){
 
 		ssize_t bytesRec =  recvfrom(sd, (void* )&buffer,
 		    			MAX_MESSAGE_SIZE, 0, &src, &size);
-		sock = new Socket(&src,size);
+		*sock = new Socket(&src,size);
 		if(bytesRec == -1){
 			printError();
 			return -1;

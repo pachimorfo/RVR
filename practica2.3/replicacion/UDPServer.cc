@@ -59,7 +59,7 @@ void UDPServer::server_thread()
 			struct sockaddr src;
 			socklen_t size = sizeof(src);
 
-			Socket* newSocket;
+			Socket * newSocket;
 
 			socket.recv(buf,&newSocket);
 
@@ -78,11 +78,19 @@ void UDPServer::add_connection (Socket * s)
 
 	bool alreadyIn = false;
 
-	for(Socket* mySocket : connections){
+	std::vector<Socket*>::iterator it = connections.begin();
+	std::vector<Socket*>::iterator itEnd = connections.end();
 
-		if(s == mySocket){delete s; alreadyIn = true;}
+	while(it != itEnd){
 
+		if((*it) == s){
+			it = connections.erase(it);
+			alreadyIn = true;
+
+		}else
+			it++;
 	}
+
 
 	if(!alreadyIn && connections.size() < THREAD_POOL_SIZE){
 		connections.push_back(s);

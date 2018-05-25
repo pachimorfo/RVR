@@ -72,12 +72,19 @@ public:
     	msg.from_bin(buffer);
 
 
+    	for(int i = 0; i < connections.size(); i++){
 
-    	for(Socket* mySocket : connections){
+    		Socket* s = connections.at(i);
+    		socket.send(&msg, s);
+
+    	}
+
+
+    	/*for(Socket* mySocket : connections){
 
     		socket.send(&msg,mySocket);
 
-    	}
+    	}*/
 
 
 
