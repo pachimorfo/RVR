@@ -79,7 +79,6 @@ public:
 
     	}
 
-
     	/*for(Socket* mySocket : connections){
 
     		socket.send(&msg,mySocket);
@@ -105,6 +104,7 @@ public:
     {
     	char c[80];
     	ChatMessage* msg;
+
     	while(true){
 
     		std::cin >> c;
@@ -117,10 +117,13 @@ public:
 
     void net_thread()
     {
+
     	ChatMessage msg;
-    	char c[80];
+    	char* c;
+
     	while(true){
 
+    		//std::cout << "hey";
     		socket.recv(c);
     		msg.from_bin(c);
 

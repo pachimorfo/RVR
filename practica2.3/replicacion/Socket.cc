@@ -3,6 +3,15 @@
 #include <errno.h>
 #include <string.h>
 #include <stdexcept>
+
+#include <sys/types.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // Implementación Socket
@@ -79,7 +88,8 @@ Socket::Socket(const char * address, const char * port):sd(-1)
 	sa  = *(res->ai_addr);
 	sa_len = res->ai_addrlen;
 	if(eGetAddr != 0){
-		printError();
+		//printError();
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(eGetAddr));
 		throw new std::runtime_error("Error getaddrinfo");
 	}
 
@@ -87,6 +97,7 @@ Socket::Socket(const char * address, const char * port):sd(-1)
 
 	if(sd == -1){
 		printError();
+		std::cout << "error socket";
 		throw new std::runtime_error("Error socket");
 	}
 
@@ -136,15 +147,19 @@ int Socket::recv(char * buffer, Socket ** sock)
 
 	struct sockaddr src;
 	socklen_t size = sizeof(src);
+	std::cout << "probamos recv";
 	buffer = (char*)malloc(MAX_MESSAGE_SIZE);
 	char host[NI_MAXHOST];
 	char server[NI_MAXSERV];
 
 	if(*sock != 0){
-
 		ssize_t bytesRec =  recvfrom(sd, (void* )&buffer,
 		    			MAX_MESSAGE_SIZE, 0, &src, &size);
+		std::cout << "va guay recv";
+
 		*sock = new Socket(&src,size);
+
+
 		if(bytesRec == -1){
 			printError();
 			return -1;
